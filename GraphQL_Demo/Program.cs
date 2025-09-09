@@ -1,4 +1,10 @@
+using GraphiQl;
+using GraphQL;
+using GraphQL.Types;
+using GraphQL_Demo;
+using GraphQL_Demo.Query;
 using GraphQL_Demo.Repositories;
+using GraphQL_Demo.Type;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,8 +15,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IMenuRepository, MenuRepository>();
+builder.Services.AddScoped<MenuType>();
+builder.Services.AddScoped<MenuQuery>();
+builder.Services.AddScoped<ISchema, MenuSchema>();
+builder.Services.AddGraphQL(b => b.AddAutoSchema<ISchema>().AddSystemTextJson());
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -20,6 +31,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseGraphiQl("/graphql");
+app.UseGraphQL<ISchema>();
 
 app.UseAuthorization();
 
