@@ -1,6 +1,7 @@
 ﻿using GraphQL;
 using GraphQL.Types;
 using GraphQL_Demo.Repositories;
+using GraphQL_Demo.Type;
 
 namespace GraphQL_Demo.Query
 {
@@ -8,20 +9,17 @@ namespace GraphQL_Demo.Query
     {
         public MenuQuery(IMenuRepository menuRepository)
         {
-            Field<ListGraphType<Type.MenuType>>(
-                "Menus",
-                resolve: context => menuRepository.GetAllMenu()
-            );
+            Field<ListGraphType<MenuType>>("menus")
+            .Resolve(ctx => menuRepository.GetAllMenu());
 
-            Field<Type.MenuType>(
-                "Menu",
-                arguments: new QueryArguments(new QueryArgument<NonNullGraphType<IntGraphType>> { Name = "Id" }),
-                resolve: context =>
+            Field<MenuType>("menu")
+                .Argument<NonNullGraphType<IntGraphType>>("id", "The menu id")  // new style
+                .Resolve(ctx =>
                 {
-                    var id = context.GetArgument<int>("Id");
+                    var id = ctx.GetArgument<int>("id");   // keep using GetArgument
                     return menuRepository.GetMenuById(id);
-                }
-            );
+                });
+
         }
     }
 }

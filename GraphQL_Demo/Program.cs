@@ -2,6 +2,7 @@
 using GraphQL.Server.Ui.GraphiQL;
 using GraphQL.Types;
 using GraphQL_Demo;
+using GraphQL_Demo.Mutation;
 using GraphQL_Demo.Query;
 using GraphQL_Demo.Repositories;
 using GraphQL_Demo.Type;
@@ -13,7 +14,11 @@ builder.Services.AddControllers();
 // Repos & GraphQL types
 builder.Services.AddSingleton<IMenuRepository, MenuRepository>();
 builder.Services.AddSingleton<MenuType>();
+builder.Services.AddSingleton<MenuInputType>();
+
 builder.Services.AddSingleton<MenuQuery>();
+
+builder.Services.AddSingleton<MenuMutation>();
 builder.Services.AddSingleton<MenuSchema>(); // concrete schema
 
 // GraphQL server
