@@ -1,5 +1,5 @@
 ﻿using GraphQL.Types;
-using GraphQL_Demo.DTOs;
+using GraphQL_Demo.Entities;
 
 namespace GraphQL_Demo.Type
 {
@@ -11,6 +11,8 @@ namespace GraphQL_Demo.Type
             Field(x => x.Name).Description("Menu Name");
             Field(x => x.Description, nullable: true).Description("Menu Description");
             Field(x => x.Price).Description("Menu Price");
+            Field(x => x.ImageUrl).Description("Image");
+            Field(x => x.CategoryId).Description("Category Id");
         }
     }
 }

@@ -1,29 +1,31 @@
-﻿using GraphQL_Demo.DTOs;
+﻿using GraphQL_Demo.Data;
+using GraphQL_Demo.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace GraphQL_Demo.Repositories
 {
     public class MenuRepository : IMenuRepository
     {
-        private static List<Menu> Menus = new List<Menu>()
+        private readonly GraphQLDbContext _context;
+
+        public MenuRepository(GraphQLDbContext graphQLDbContext)
         {
-            new Menu() { Id = 1, Name = "Pizza", Description = "Delicious cheese pizza", Price = 9.99 },
-            new Menu() { Id = 2, Name = "Burger", Description = "Juicy beef burger", Price = 7.99 },
-            new Menu() { Id = 3, Name = "Pasta", Description = "Italian pasta with marinara sauce", Price = 8.99 },
-            new Menu() { Id = 4, Name = "Salad", Description = "Fresh garden salad", Price = 5.99 },
-            new Menu() { Id = 5, Name = "Sushi", Description = "Assorted sushi platter", Price = 12.99 }
-        };
+            _context = graphQLDbContext;
+        }
         public Menu AddMenu(Menu menu)
         {
-            Menus.Add(menu);
+            _context.Add(menu);
+            _context.SaveChanges();
             return menu;
         }
 
         public bool DeleteMenu(int id)
         {
-            var menu = Menus.FirstOrDefault(m => m.Id == id);
+            var menu = _context.Menus.FirstOrDefault(m => m.Id == id);
             if (menu != null)
             {
-                Menus.Remove(menu);
+                _context.Menus.Remove(menu);
+                _context.SaveChanges();
                 return true;
             }
             return false;
@@ -31,23 +33,30 @@ namespace GraphQL_Demo.Repositories
 
         public List<Menu> GetAllMenu()
         {
-            return Menus;
+            return _context.Menus.ToList();
+        }
+
+        public List<Menu> getMenuByCategoryId(int categoryId)
+        {
+            var category = _context.Categories.Include(c => c.Menus).FirstOrDefault(c => c.Id == categoryId);
+            return category?.Menus ?? new List<Menu>();
         }
 
         public Menu GetMenuById(int id)
         {
-            return Menus.FirstOrDefault(m => m.Id == id);
+            return _context.Menus.FirstOrDefault(m => m.Id == id);
         }
 
         public Menu UpdateMenu(int id, Menu menu)
         {
-            var existingMenu = Menus.FirstOrDefault(m => m.Id == id);
+            var existingMenu = _context.Menus.FirstOrDefault(m => m.Id == id);
             if (existingMenu != null)
             {
                 existingMenu.Name = menu.Name;
                 existingMenu.Description = menu.Description;
                 existingMenu.Price = menu.Price;
             }
+            _context.SaveChanges();
             return existingMenu;
         }
     }

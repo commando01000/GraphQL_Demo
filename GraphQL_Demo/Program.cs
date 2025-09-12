@@ -2,38 +2,64 @@
 using GraphQL.Server.Ui.GraphiQL;
 using GraphQL.Types;
 using GraphQL_Demo;
+using GraphQL_Demo.Data;
 using GraphQL_Demo.Mutation;
 using GraphQL_Demo.Query;
 using GraphQL_Demo.Repositories;
 using GraphQL_Demo.Type;
+using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder(args);
+public class Program
+{
+    private static void Main(string[] args)
+    {
+        var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+        builder.Services.AddControllers();
 
-// Repos & GraphQL types
-builder.Services.AddSingleton<IMenuRepository, MenuRepository>();
-builder.Services.AddSingleton<MenuType>();
-builder.Services.AddSingleton<MenuInputType>();
 
-builder.Services.AddSingleton<MenuQuery>();
+        // Add EF Core
+        builder.Services.AddDbContext<GraphQLDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddSingleton<MenuMutation>();
-builder.Services.AddSingleton<MenuSchema>(); // concrete schema
+        // Repos & GraphQL types
+        builder.Services.AddScoped<IMenuRepository, MenuRepository>();
+        builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+        builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 
-// GraphQL server
-builder.Services.AddGraphQL(b => b
-    .AddSchema<MenuSchema>()      // use the concrete schema type
-    .AddSystemTextJson());
+        builder.Services.AddScoped<MenuQuery>();
+        builder.Services.AddScoped<RootQuery>();
 
-var app = builder.Build();
+        builder.Services.AddScoped<MenuMutation>();
+        builder.Services.AddScoped<ISchema>(provider =>
+        {
+            return new RootSchema(provider)
+            {
+                Query = provider.GetRequiredService<RootQuery>(),
+                Mutation = provider.GetRequiredService<MenuMutation>()
+            };
+        });
 
-app.MapGraphQL("/graphql");
-app.UseGraphQLGraphiQL("/ui/graphiql", new GraphiQLOptions { GraphQLEndPoint = "/graphql" });
-app.MapGet("/", () => Results.Redirect("/ui/graphiql"));
 
-app.UseHttpsRedirection();
-app.UseAuthorization();
-app.MapControllers();
+        // GraphQL server
+        builder.Services
+            .AddGraphQL(b => b
+                .AddSchema<RootSchema>()
+                .AddSystemTextJson() // or .AddNewtonsoftJson()
+                .AddGraphTypes(typeof(RootSchema).Assembly) // For auto-registering types
+                .AddErrorInfoProvider(opt => opt.ExposeExceptionDetails = true) // Optional, for debugging
+            );
 
-app.Run();
+        var app = builder.Build();
+
+        app.MapGraphQL("/graphql");
+        app.UseGraphQLGraphiQL("/ui/graphiql", new GraphiQLOptions { GraphQLEndPoint = "/graphql" });
+        app.MapGet("/", () => Results.Redirect("/ui/graphiql"));
+
+        app.UseHttpsRedirection();
+        app.UseAuthorization();
+        app.MapControllers();
+
+        app.Run();
+    }
+}

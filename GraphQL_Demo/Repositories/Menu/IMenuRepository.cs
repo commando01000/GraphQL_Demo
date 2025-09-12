@@ -1,4 +1,4 @@
-﻿using GraphQL_Demo.DTOs;
+﻿using GraphQL_Demo.Entities;
 
 namespace GraphQL_Demo.Repositories
 {
@@ -9,5 +9,7 @@ namespace GraphQL_Demo.Repositories
         Menu AddMenu(Menu menu);
         Menu UpdateMenu(int id, Menu menu);
         bool DeleteMenu(int id);
+        List<Menu> getMenuByCategoryId(int categoryId);
+
     }
 }

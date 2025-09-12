@@ -1,6 +1,6 @@
 ﻿using GraphQL;
 using GraphQL.Types;
-using GraphQL_Demo.DTOs;
+using GraphQL_Demo.Entities;
 using GraphQL_Demo.Repositories;
 using GraphQL_Demo.Type;
 
