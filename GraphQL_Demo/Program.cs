@@ -27,16 +27,15 @@ public class Program
         builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
         builder.Services.AddScoped<IReservationRepository, ReservationRepository>();
 
-        builder.Services.AddScoped<MenuQuery>();
+        builder.Services.AddScoped<RootMutation>();
         builder.Services.AddScoped<RootQuery>();
 
-        builder.Services.AddScoped<MenuMutation>();
         builder.Services.AddScoped<ISchema>(provider =>
         {
             return new RootSchema(provider)
             {
                 Query = provider.GetRequiredService<RootQuery>(),
-                Mutation = provider.GetRequiredService<MenuMutation>()
+                Mutation = provider.GetRequiredService<RootMutation>()
             };
         });
 

@@ -18,6 +18,23 @@ namespace GraphQL_Demo.Repositories
             return newCategory.Entity;
         }
 
+        public Category AddMenuToCategory(int categoryId, int menuId)
+        {
+            var category = _dbContext.Categories.Find(categoryId);
+            var menu = _dbContext.Menus.Find(menuId);
+            if (category == null || menu == null)
+            {
+                return null;
+            }
+            if (category.Menus == null)
+            {
+                category.Menus = new List<Menu>();
+            }
+            category.Menus.Add(menu);
+            _dbContext.SaveChanges();
+            return category;
+        }
+
         public bool DeleteCategory(int id)
         {
             var category = _dbContext.Categories.Find(id);

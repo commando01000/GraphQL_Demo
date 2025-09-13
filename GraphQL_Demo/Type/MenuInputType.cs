@@ -7,7 +7,7 @@ namespace GraphQL_Demo.Type
         public MenuInputType()
         {
             Name = "MenuInput";
-            Field<NonNullGraphType<IntGraphType>>("id").Description("The id of the menu");
+            Field<IntGraphType>("id").Description("The id of the menu");
             Field<NonNullGraphType<StringGraphType>>("name").Description("The name of the menu");
             Field<NonNullGraphType<FloatGraphType>>("price").Description("The price of the menu");
             Field<StringGraphType>("description").Description("The description of the menu");

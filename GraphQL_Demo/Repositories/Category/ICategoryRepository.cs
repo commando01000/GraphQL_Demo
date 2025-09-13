@@ -9,5 +9,6 @@ namespace GraphQL_Demo.Repositories
         Category AddCategory(Category category);
         Category UpdateCategory(int id, Category category);
         bool DeleteCategory(int id);
+        Category AddMenuToCategory(int categoryId, int menuId);
     }
 }
